@@ -1,0 +1,6 @@
+{
+	"Name" : "homeautomation",
+	"Port" : "8080",
+
+	"HTMLPath" : "~/server/public/"
+}
