@@ -1,10 +1,10 @@
 package main
 
 import (
-	"net/http"
 	"fmt"
 	"encoding/json"
 	"os"
+	"github.com/go-martini/martini"
 )
 
 // Create struct for settings
@@ -17,7 +17,7 @@ type Config struct {
 }
 
 func main() {
-
+	m := martini.Classic()
 	fmt.Println("[SERVER STARTED]")
 
 	// Load settings from conf.json
@@ -36,6 +36,10 @@ func main() {
 
 
 	// Start testing go server
-    http.Handle("/", http.FileServer(http.Dir(conf.HTMLPath)))
-    http.ListenAndServe(conf.Port, nil)
+
+	m.Get("/test", func() string {
+	  return "Hello world!"
+	})
+	m.Use(martini.Static("homeauto-client/dist"))
+	m.Run()
 }
