@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"os"
+	"log"
 	"os/exec"
 	"github.com/go-martini/martini"
 )
@@ -11,25 +12,31 @@ import (
 // Create struct for settings
 // TODO: move to some more usefull location
 type Config struct {
-	Name		string
-	Port		string
-	HTMLPath	string
-
+	Name			string `json:"name"`
+	Port			string `json:"port"`
+	HTMLPath		string `json:"wwwPath"`
+	Raspremote 		string `json:"raspremote"`
+	Test			string `json:"test"`
 }
 
 func main() {
 	m := martini.Classic()
-	fmt.Println("[SERVER STARTED]")
+	fmt.Println("[READING CONFIG]")
 
-	// Load settings from conf.json
-	file, _ := os.Open("conf.json")
-	decoder := json.NewDecoder(file)
-	conf := Config{}
+	var settings Config;
 
-	// Handle parsing errors
-	err := decoder.Decode(&conf)
+	// then config file settings
+	configFile, err := os.Open("conf.json")
+	if err != nil {
+	    log.Fatal(err)
+	}
 
-	fmt.Println(conf);
+	jsonParser := json.NewDecoder(configFile)
+	if err = jsonParser.Decode(&settings); err != nil {
+	    log.Fatal(err)
+	}
+
+	fmt.Println(settings);
 
 	if err != nil {
 	  fmt.Println("error:", err)
@@ -38,12 +45,12 @@ func main() {
 
 	// Start testing go server
 
-	m.Get("/test/:id", func(params martini.Params) string {
-		fmt.Println("TESTING");
+	m.Get("/test/:device/:command", func(params martini.Params) string {
+		fmt.Println(settings.Raspremote + " " + params["device"] + " " + params["command"]);
 		testString	:= []string{"element1", "element2", "element3"}
 
 		// Call send comand for 433 Mhz receiver
-		cmd := "/root/raspberry-remote/send 11111 1 1"
+		cmd :=  settings.Raspremote + " " + params["device"] + " " + params["command"]
 
 		exec.Command("sh","-c", cmd).Output()
 
