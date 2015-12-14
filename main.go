@@ -43,7 +43,7 @@ func main() {
 		testString	:= []string{"element1", "element2", "element3"}
 
 		// Call send comand for 433 Mhz receiver
-		cmd := "/root/send 11111 1 1"
+		cmd := "/root/raspberry-remote/send 11111 1 1"
 
 		exec.Command("sh","-c", cmd).Output()
 
