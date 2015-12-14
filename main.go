@@ -14,7 +14,7 @@ import (
 type Config struct {
 	Name			string `json:"name"`
 	Port			string `json:"port"`
-	HTMLPath		string `json:"wwwPath"`
+	PublicPath		string `json:"wwwPath"`
 	Raspremote 		string `json:"raspremote"`
 	Test			string `json:"test"`
 }
@@ -58,6 +58,6 @@ func main() {
 
 		return string(json);
 	})
-	m.Use(martini.Static("homeauto-client/dist"))
+	m.Use(martini.Static(settings.PublicPath))
 	m.Run()
 }
