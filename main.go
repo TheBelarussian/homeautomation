@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"os"
+	"os/exec"
 	"github.com/go-martini/martini"
 )
 
@@ -37,8 +38,18 @@ func main() {
 
 	// Start testing go server
 
-	m.Get("/test", func() string {
-	  return "Hello world!"
+	m.Get("/test/:id", func(params martini.Params) string {
+		fmt.Println("TESTING");
+		testString	:= []string{"element1", "element2", "element3"}
+
+		// Call send comand for 433 Mhz receiver
+		cmd := "/root/send 11111 1 1"
+
+		exec.Command("sh","-c", cmd).Output()
+
+    	json, _ := json.Marshal(testString)
+
+		return string(json);
 	})
 	m.Use(martini.Static("homeauto-client/dist"))
 	m.Run()
