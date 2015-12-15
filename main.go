@@ -56,8 +56,9 @@ func main() {
 
     	json, _ := json.Marshal(testString)
 
-		return string(json);
+		return string(json)
 	})
+	fmt.Println(settings.PublicPath)
 	m.Use(martini.Static(settings.PublicPath))
 	m.Run()
 }

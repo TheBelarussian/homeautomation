@@ -1,6 +1,6 @@
 {
-	"Name" 			  : "homeautomation",
-	"Port" 			  : "8080",
-	"HTMLPath" 		  : "~/server/public/",
+	"name" 			  : "homeautomation",
+	"port" 			  : "8080",
+	"servePath" 	  : "~/server/public/",
 	"raspberryRemote" : "/root/raspberry-remote/send 11111"
 }
