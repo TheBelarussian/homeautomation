@@ -25,3 +25,5 @@ _testmain.go
 
 # Mac OSX specific ignores
 .DS_STORE
+.DS_STORE/*
+.vscode
