@@ -17,7 +17,7 @@ The main features I want to achieve at first are:
 # Webpage 
 The webpage for this project will eather be based on the go template engine
 or be written in Angular 2.0 (with maybe a little of Googles Polimer since I want to get into that as well).
-The webpage will be is in a different repository called homeauto-client (not yet but soon). So please stand by.
+The webpage will be in a different repository called homeauto-client. What should I say work in progress.
 
 # Settings
 the conf.json file will be the main configuration file for the server
