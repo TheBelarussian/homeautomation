@@ -125,7 +125,7 @@ func main() {
 
 	// TEST FLAG values
 	if Debug {
-		color.Yellow("[SERVER RUNNING IN DEBUG MODE!]")
+		color.Yellow("[SERVER RUNNING IN DEBUG MODE!!]")
 	}
 
 	if DummyMode {
