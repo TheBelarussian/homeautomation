@@ -11,8 +11,33 @@ import (
 
 var (
 	// Use mcu pin 10, corresponds to physical pin 19 on the pi
-	pin = rpio.Pin(4)
+	blinkPin = rpio.Pin(4)
+	rccPin   = rpio.Pin(3)
+	//pulseLength = 300
 )
+
+func testRCCSend() {
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	defer rpio.Close()
+
+	rccPin.Output()
+
+	// Toggle pin 20 times
+	for x := 0; x < 20; x++ {
+		state := x % 2
+		color.Green("Sending: ", state)
+		if state == 1 {
+			rccPin.High()
+		} else {
+			rccPin.Low()
+		}
+		time.Sleep(300)
+	}
+}
 
 func testGPIO() {
 	// Open and map memory to access gpio, check for errors
@@ -25,12 +50,12 @@ func testGPIO() {
 	defer rpio.Close()
 
 	// Set pin to output mode
-	pin.Output()
+	blinkPin.Output()
 
 	// Toggle pin 20 times
 	for x := 0; x < 20; x++ {
 		color.Green("Blinking...")
-		pin.Toggle()
+		blinkPin.Toggle()
 		time.Sleep(time.Second / 5)
 	}
 }
