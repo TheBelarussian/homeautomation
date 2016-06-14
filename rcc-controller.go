@@ -26,9 +26,11 @@ func testRCCSend() {
 
 	rccPin.Output()
 
+	testCode := [13]int{1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0}
+
 	// Toggle pin 20 times
-	for x := 0; x < 20; x++ {
-		state := x % 2
+	for x := 0; x < len(testCode); x++ {
+		state := testCode[x]
 
 		if state == 1 {
 			color.Green("High: ", state)
