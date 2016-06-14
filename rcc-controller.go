@@ -11,7 +11,7 @@ import (
 
 var (
 	// Use mcu pin 10, corresponds to physical pin 19 on the pi
-	pin = rpio.Pin(10)
+	pin = rpio.Pin(4)
 )
 
 func testGPIO() {
