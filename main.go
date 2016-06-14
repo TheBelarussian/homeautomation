@@ -156,6 +156,13 @@ func main() {
 		d := Device{0, "Test device", "Lamp", 22}
 
 		NewDevice(&d)
+
+		// Test GPIO
+
+	}
+
+	if !DummyMode {
+		testGPIO()
 	}
 
 	ListDevices()
