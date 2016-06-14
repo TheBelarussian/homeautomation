@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/stianeikeland/go-rpio"
 )
 
@@ -28,6 +29,7 @@ func testGPIO() {
 
 	// Toggle pin 20 times
 	for x := 0; x < 20; x++ {
+		color.Green("Blinking...")
 		pin.Toggle()
 		time.Sleep(time.Second / 5)
 	}

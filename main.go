@@ -162,6 +162,7 @@ func main() {
 	}
 
 	if !DummyMode {
+		color.Yellow("[TESTING GPIO!!]")
 		testGPIO()
 	}
 
