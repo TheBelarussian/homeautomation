@@ -164,6 +164,7 @@ func main() {
 	if !DummyMode {
 		color.Yellow("[TESTING GPIO!!]")
 		testGPIO()
+		testRCCSend()
 	}
 
 	ListDevices()

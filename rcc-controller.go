@@ -29,10 +29,12 @@ func testRCCSend() {
 	// Toggle pin 20 times
 	for x := 0; x < 20; x++ {
 		state := x % 2
-		color.Green("Sending: ", state)
+
 		if state == 1 {
+			color.Green("High: ", state)
 			rccPin.High()
 		} else {
+			color.Green("Low: ", state)
 			rccPin.Low()
 		}
 		time.Sleep(300)
