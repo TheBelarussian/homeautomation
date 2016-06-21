@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/boltdb/bolt"
+	"github.com/fatih/color"
 )
 
 // Device is a struct representation of a device.
@@ -16,10 +17,11 @@ type Device struct {
 	RoomID int    `json:"roomid"`
 }
 
-// NewDevice creates a new device entry in the database
-func NewDevice(t *Device) error {
+// NewDevice creates a new device entry in the database.
+// Return an error and the id of the created device.
+func NewDevice(t *Device) (int, error) {
 	fmt.Println(t)
-	return DB.Update(func(tx *bolt.Tx) error {
+	return t.ID, DB.Update(func(tx *bolt.Tx) error {
 		// Retrieve the users bucket.
 		// This should be created when the DB is first opened.
 		b := tx.Bucket([]byte("devices"))
@@ -41,11 +43,19 @@ func NewDevice(t *Device) error {
 	})
 }
 
-// itob returns an 8-byte big endian representation of v.
-func itob(v int) []byte {
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, uint64(v))
-	return b
+// RemoveDevice removes a device from the database.
+func RemoveDevice(id int) error {
+	if Debug {
+		color.Red("Removing device ID:", id)
+	}
+
+	// Start a bolt transaction.
+	return DB.Update(func(tx *bolt.Tx) error {
+		// Try to delete device with the given id from the bucket.
+		v := tx.Bucket([]byte("devices")).Delete(itob(id))
+		fmt.Print("response", v)
+		return v
+	})
 }
 
 // ListDevices returns a array of all device structs in the devices bucket
@@ -55,15 +65,15 @@ func ListDevices() []Device {
 	DB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("devices"))
 
-		b.ForEach(func(k, v []byte) error {
-			d := Device{}
+		b.ForEach(func(key, v []byte) error {
+			device := Device{}
 			// Decode json value of cell to Device struct type
-			err := json.Unmarshal(v, &d)
+			err := json.Unmarshal(v, &device)
 			if err != nil {
 				return nil
 			}
-			devices = append(devices, d)
-			fmt.Println(k, d)
+			devices = append(devices, device)
+			fmt.Println(key, device)
 
 			return nil
 		})
@@ -73,10 +83,21 @@ func ListDevices() []Device {
 	return devices
 }
 
-//
-func GetDevice(ID int) Device {
-	device := Device{}
-	
-	// Get device from DB
-	return device
+// GetDevice return a device. If device is not found or an error occurs while getting the device
+// an error is beeing thrown.
+func GetDevice(id int) (Device, error) {
+	var device Device
+	err := DB.View(func(tx *bolt.Tx) error {
+		// Try to get the device from the bucket.
+		value := tx.Bucket([]byte("devices")).Get(itob(id))
+
+		// If no device found return error.
+		if value == nil {
+			return errors.New("No device found with given id.")
+		}
+
+		// Parse value into the device struct.
+		return json.Unmarshal(value, &device)
+	})
+	return device, err
 }

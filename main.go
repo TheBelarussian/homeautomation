@@ -96,6 +96,10 @@ func initDatabase(dbPath string) (*bolt.DB, error) {
 // Close server, write data and close sockets.
 func controlledQuit(c chan os.Signal) {
 	<-c
+	quit()
+}
+
+func quit() {
 	color.Green("Cleany closy worky worky...")
 	// Close database.
 	err := DB.Close()
@@ -155,8 +159,21 @@ func main() {
 	if Debug {
 		d := Device{0, "Test device", "Lamp", 22}
 
-		NewDevice(&d)
+		deviceID, err := NewDevice(&d)
 
+		if err != nil {
+			color.Red("Failed to add new device to DB. This is kind of fatal so go panic, try not to cry, cry a lot!")
+			quit()
+		}
+
+		color.Green("Device added with id:", deviceID)
+		ListDevices()
+		err = RemoveDevice(deviceID)
+
+		if err != nil {
+			color.Red("Failed to remove device from DB. This is kind of fatal so go panic and cry!")
+			quit()
+		}
 		// Test GPIO
 
 	}
@@ -166,8 +183,6 @@ func main() {
 		testGPIO()
 		testRCCSend()
 	}
-
-	ListDevices()
 
 	// Create Router (multiplexer)
 	router := NewRouter()
