@@ -3,6 +3,16 @@
 *.a
 *.so
 
+# Ignore binary
+homeautomat
+homeauto
+Homeautomat
+homeautomation
+Homeautomation
+
+# Ignore Database
+*.db
+
 # Folders
 _obj
 _test
