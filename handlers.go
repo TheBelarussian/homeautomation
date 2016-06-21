@@ -151,7 +151,7 @@ func RoomCreateHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Data fromn client:", room)
 
 	// Send response to client if new item was created
-	t := NewRoom(room)
+	t := NewRoom(&room)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(t); err != nil {
@@ -161,7 +161,7 @@ func RoomCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // Lists all rooms
 func RoomListHandler(w http.ResponseWriter, r *http.Request) {
-	rooms = ListRooms()
+	rooms := ListRooms()
 
 	// Try to send list of devices to client
 	data, err := json.Marshal(rooms)

@@ -79,13 +79,26 @@ func initDatabase(dbPath string) (*bolt.DB, error) {
 	}
 	color.Green("[DB: OK]")
 	// Init buckets if not present
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte("devices"))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		return nil
-	})
+	for i := 0; i < 2; i++ {
+		err = db.Update(func(tx *bolt.Tx) error {
+			switch i {
+			// Init a bucket for the devices
+			case 0:
+				_, err := tx.CreateBucketIfNotExists([]byte("devices"))
+				if err != nil {
+					return fmt.Errorf("create bucket: %s", err)
+				}
+				return nil
+			// Init a bucket for the rooms
+			default:
+				_, err := tx.CreateBucketIfNotExists([]byte("rooms"))
+				if err != nil {
+					return fmt.Errorf("create bucket: %s", err)
+				}
+				return nil
+			}
+		})
+	}
 	if err != nil {
 		log.Fatal("Could not create bucket in DB", err)
 	}
@@ -152,6 +165,7 @@ func main() {
 
 	defer DB.Close()
 
+	// TODO: add one or more rooms
 	if Debug {
 		d := Device{0, "Test device", "Lamp", 22}
 
