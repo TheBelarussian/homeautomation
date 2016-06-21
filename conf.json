@@ -2,6 +2,6 @@
 	"Name" : "homeautomation",
 	"Port" : "8080",
 	"Database" : "datastore.db",
-	"HTMLPath" : "~/server/public/"
+	"HTMLPath" : "./homeauto-client/"
 }
 
