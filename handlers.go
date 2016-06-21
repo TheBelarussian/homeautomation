@@ -1,7 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/fatih/color"
 	//color "github.com/fatih/color"
 	"encoding/json"
 	"io"
@@ -45,6 +48,13 @@ func DeviceCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Parse data from client
 	err = json.Unmarshal(body, &device)
+
+	// Check if all requered fields are filled.
+	if device.Name == "" || device.Type == "" {
+		fmt.Print("Invalid data from client. Name and Type must be defined for a new device.")
+		err = errors.New("Some requered field in device struct are empty.")
+	}
+
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
@@ -54,7 +64,7 @@ func DeviceCreateHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Data fromn client:", device)
 
 	// Send response to client if new item was created
-	err = NewDevice(&device)
+	_, err = NewDevice(&device)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(405)
@@ -65,11 +75,52 @@ func DeviceCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func DeviceDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	var device Device
+
+	// Read data from client
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+
+	// Check for error
+	err = r.Body.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	// Parse data from client
+	err = json.Unmarshal(body, &device)
+
+	// Check if all requered fields are filled.
+	if device.ID == 0 {
+		fmt.Print("Invalid data from client. ID is requered when removing a device.")
+		err = errors.New("Some requered field in device struct are empty.")
+	}
+
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422) // unprocessable entity
+		return
+	}
+
+	fmt.Println("Data fromn client:", device)
+
+	err = RemoveDevice(device.ID)
+
+	if err != nil {
+		color.Red("Could not remove device")
+	}
+}
+
 func DeviceListHandler(w http.ResponseWriter, r *http.Request) {
 	devices := ListDevices()
 
 	// Try to send list of devices to client
-	data, err := json.Marshal(devices)
+	data, err := json.Marshal(struct {
+		Data []Device `json: "data"`
+	}{devices})
 	// If this fails responde with error code 500 for internal server error
 	if err != nil {
 
@@ -96,7 +147,7 @@ func DeviceListHandler(w http.ResponseWriter, r *http.Request) {
 
 func DeviceGetHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println("Device id:", mux.Vars(r)["deviceID"])
-	device := GetDevice(0)
+	device, err := GetDevice(0)
 
 	// Try to send list of devices to client
 	data, err := json.Marshal(device)

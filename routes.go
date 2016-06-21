@@ -79,6 +79,8 @@ func NewRouter() *mux.Router {
 	return router
 }
 
+var prefix = "/api"
+
 var routes = Routes{
 	Route{
 		"Test",
@@ -90,35 +92,41 @@ var routes = Routes{
 	// Device based routes
 	Route{
 		"CreateDevice",
-		"POST",
-		"/API/devices/add",
+		"CREATE",
+		prefix + "/device/add",
 		DeviceCreateHandler,
+	},
+	Route{
+		"DeleteDevice",
+		"DELETE",
+		prefix + "/device/delete",
+		DeviceDeleteHandler,
 	},
 	Route{
 		"ListDevices",
 		"GET",
-		"/API/devices/list",
+		prefix + "/devices/list",
 		DeviceListHandler,
 	},
 
 	Route{
 		"GetDevice",
 		"GET",
-		"/API/device/{deviceID}",
+		prefix + "/device/{deviceID}",
 		DeviceGetHandler,
 	},
 
 	// Room based routes
 	Route{
-		"CreateDevice",
+		"CreateRoom",
 		"POST",
-		"/API/rooms/add",
+		prefix + "/rooms/add",
 		RoomCreateHandler,
 	},
 	Route{
-		"ListDevices",
+		"ListRooms",
 		"GET",
-		"/API/rooms/list",
+		prefix + "/rooms/list",
 		RoomListHandler,
 	},
 }
