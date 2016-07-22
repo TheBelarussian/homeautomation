@@ -16,6 +16,18 @@ var (
 	//pulseLength = 300
 )
 
+// InitRCC adds type and callback to types map.
+func InitRCC() {
+	AddDeviceType("RCCSimple", RCCCommandHandler)
+}
+
+// RCCCommandHandler handles command string for RCCSimple Type devices.
+func RCCCommandHandler(data *GenericCommand) {
+	if Debug {
+		fmt.Println("Processing RCCSimple Command", data)
+	}
+}
+
 func testRCCSend() {
 	if err := rpio.Open(); err != nil {
 		fmt.Println(err)

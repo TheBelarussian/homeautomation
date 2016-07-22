@@ -3,10 +3,8 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/boltdb/bolt"
-	"github.com/fatih/color"
 )
 
 // Device is a struct representation of a device.
@@ -17,45 +15,50 @@ type Device struct {
 	RoomID int    `json:"roomid"`
 }
 
-// NewDevice creates a new device entry in the database.
-// Return an error and the id of the created device.
-func NewDevice(t *Device) (int, error) {
-	fmt.Println(t)
-	return t.ID, DB.Update(func(tx *bolt.Tx) error {
-		// Retrieve the users bucket.
-		// This should be created when the DB is first opened.
-		b := tx.Bucket([]byte("devices"))
-
-		// Generate ID for the user.
-		// This returns an error only if the Tx is closed or not writeable.
-		// That can't happen in an Update() call so I ignore the error check.
-		id, _ := b.NextSequence()
-		t.ID = int(id)
-
-		// Marshal user data into bytes.
-		buf, err := json.Marshal(t)
-		if err != nil {
-			return err
-		}
-
-		// Persist bytes to users bucket.
-		return b.Put(itob(t.ID), buf)
-	})
+// GenericCommand proviedes a generalized structure for the command calls.
+type GenericCommand struct {
+	Type     string `json:"type"`
+	TargetID int    `json:"id"`
+	Command  string `json:"command"`
 }
 
-// RemoveDevice removes a device from the database.
-func RemoveDevice(id int) error {
-	if Debug {
-		color.Red("Removing device ID:", id)
-	}
+// GetID implements StorableElement interface.
+func (d Device) GetID() int {
+	return d.ID
+}
 
-	// Start a bolt transaction.
-	return DB.Update(func(tx *bolt.Tx) error {
-		// Try to delete device with the given id from the bucket.
-		v := tx.Bucket([]byte("devices")).Delete(itob(id))
-		fmt.Print("response", v)
-		return v
-	})
+// SetID implements StorableElement interface.
+func (d Device) SetID(id int) StorableElement {
+	d.ID = id
+	return d
+}
+
+// ConvertToJSON implements StorableElement interface for converting Struct to JSON.
+func (d Device) ConvertToJSON(id int) ([]byte, error) {
+	if id != 0 {
+		d.ID = id
+	}
+	return json.Marshal(d)
+}
+
+// RemoveFromDB implements StorableElement interface for removing from db.
+func (d Device) RemoveFromDB() error {
+	return RemoveFromDB("devices", d.ID)
+}
+
+// SaveToDB implements StorableElement interface for storing element in db.
+func (d Device) SaveToDB() (int, error) {
+	return StoreToDB("devices", d)
+}
+
+// DispatchDeviceCommand handles mapping of command to a given device type.
+func DispatchDeviceCommand(command *GenericCommand) {
+	// TODO: validate if user has rights to control device here...
+
+	// Here we have to math a givent device Type to a control Type. Hence a device can be controlled by a number of ways.
+	// In order to allow modularity for different types of devices we have to map a control function to each type.
+	callback := GetDeviceTypeOrNil("RCCSimple")
+	callback(command)
 }
 
 // ListDevices returns a array of all device structs in the devices bucket
@@ -72,8 +75,9 @@ func ListDevices() []Device {
 			if err != nil {
 				return nil
 			}
+
 			devices = append(devices, device)
-			fmt.Println(key, device)
+			//fmt.Println(key, device)
 
 			return nil
 		})

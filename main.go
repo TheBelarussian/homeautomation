@@ -128,13 +128,13 @@ func quit() {
 // Reads in all command line arguments and
 func main() {
 
-	// Assign flag
+	// Asign flag
 	flag.BoolVar(&Debug, "debug", false, "Almost everything will be logged if this is true")
 
-	// Assign flag
+	// Asign flag
 	flag.BoolVar(&DummyMode, "dummy", false, "Starts server in debug mode with dummy 433 MHz controller")
 
-	// Assign flag
+	// Asign flag
 	flag.StringVar(&ConfigPath, "path", "conf.json", "Give path to the config pathr")
 
 	// Parse flags
@@ -169,11 +169,17 @@ func main() {
 
 	defer DB.Close()
 
+	// Init device types.
+	InitDeviceTypes()
+
+	// Init test RCCSimple Type
+	InitRCC()
+
 	// TODO: add one or more rooms
 	if Debug {
-		d := Device{0, "Test device", "Lamp", 22}
+		d := Device{0, "Power Toggle", "RCCSimple", 22}
 
-		deviceID, err := NewDevice(&d)
+		deviceID, err := d.SaveToDB()
 
 		if err != nil {
 			color.Red("Failed to add new device to DB. This is kind of fatal so go panic, try not to cry, cry a lot!")
@@ -182,7 +188,7 @@ func main() {
 
 		color.Green("Device added with id:", deviceID)
 		ListDevices()
-		err = RemoveDevice(deviceID)
+		err = RemoveFromDB("devices", deviceID)
 
 		if err != nil {
 			color.Red("Failed to remove device from DB. This is kind of fatal so go panic and cry!")
